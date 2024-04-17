@@ -5,3 +5,9 @@ pub fn es_par(number:i32) -> bool{
         false
     }
 }
+
+#[test]
+fn test_es_par(){
+    let number = 3;
+    assert_eq!(false,es_par(number));
+}
