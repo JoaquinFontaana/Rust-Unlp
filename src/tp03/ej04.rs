@@ -1,3 +1,5 @@
+use std::f64;
+
 struct Triangulo{
     base:f64,
     lado1:f64,
@@ -18,15 +20,22 @@ impl Triangulo{
         return triangulo;
     }
     fn determinar_tipo(&self) -> Tipo {
-        if self.lado1 == self.lado2 && self.lado2 == self.lado3 {
+        if self.base == self.lado1 && self.lado1 == self.lado2 {
             Tipo::Equilatero
-        } else if self.lado1 == self.lado2 || self.lado1 == self.lado3 || self.lado2 == self.lado3 {
+        } else if self.base == self.lado1 || self.base == self.lado2 || self.lado1 == self.lado2 {
             Tipo::Isosceles
         } else {
             Tipo::Escaleno
         }
     }
-    fn calcular_area(&self){
-
+    fn calcular_area(&self) -> f64 {
+        let semi_perimetro = (self.base + self.lado1 + self.lado2) / 2.0;
+        let area = (semi_perimetro * (semi_perimetro - self.base) * (semi_perimetro - self.lado1) * (semi_perimetro - self.lado2)).sqrt();
+        return area;
     }
+}
+#[test]
+fn test_calcular_area(){
+    let triangulo = Triangulo::new(2.0, 5.0, 7.0);
+    assert_eq!(triangulo.calcular_area(),14.6969);
 }
