@@ -128,3 +128,8 @@ fn test_es_mayor(){
     let fecha_comparar = Fecha::new(4,2,2002);
     assert_eq!(fecha.es_mayor(&fecha_comparar),true);
 }
+#[test]
+fn test_es_fecha_valida(){
+    let fecha = Fecha::new(1, 2, 2002);
+    assert_eq!(true,fecha.es_fecha_valida());
+}
