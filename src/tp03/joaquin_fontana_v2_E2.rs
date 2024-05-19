@@ -27,7 +27,7 @@ impl Cancion {
     }
 }
 struct Reporte{
-    info:Vec<RegistroReporte>,
+    canciones:Vec<RegistroReporte>,
     total_canciones:i32
 }
 struct RegistroReporte{
@@ -46,26 +46,6 @@ impl Genero{
         str_genero
     }
 }
-impl PartialEq for Cancion{
-    fn eq(&self,other: &Self) -> bool{
-        self.artista == other.artista && self.titulo == other.titulo  && self.genero.to_string() == other.genero.to_string()
-    }
-}
-impl Clone for Cancion {
-    fn clone(&self) -> Self {
-        Cancion {
-            titulo: self.titulo.clone(),
-            artista: self.artista.clone(),
-            genero: match self.genero{
-                Genero::Rock => Genero::Rock,
-                Genero::Pop => Genero::Pop,
-                Genero::Rap => Genero::Rap,
-                Genero::Jazz => Genero::Jazz,
-                Genero::Others => Genero::Others,
-            },
-        }
-    }
-}
 
 impl Playlist {
     fn new(nombre:String,canciones:Vec<Cancion>) -> Playlist{
@@ -79,18 +59,31 @@ impl Playlist {
         self.canciones.push(cancion);
     }
     fn eliminar_cancion(&mut self,cancion:Cancion){
-        self.canciones.retain(|a| *a != cancion);
+        let genero_str = cancion.genero.to_string();
+        for i in 0..self.canciones.len(){
+            if self.canciones[i].artista == cancion.artista 
+            && self.canciones[i].genero.to_string() == genero_str 
+            && self.canciones[i].titulo == cancion.titulo{
+                self.canciones.remove(i);
+                break;
+            }
+        }
     }
     fn mover_cancion(&mut self,cancion:Cancion,new_position:usize){
         if new_position >= 0 && new_position <= self.canciones.len()-1{ 
+            let genero_str = cancion.genero.to_string();
             for i in 0..self.canciones.len(){
-                if self.canciones[i] == cancion{
+                if self.canciones[i].artista == cancion.artista 
+                && self.canciones[i].genero.to_string() == genero_str 
+                && self.canciones[i].titulo == cancion.titulo{
                     let cancion_to_move= self.canciones.remove(i);
                     self.canciones.insert(new_position, cancion_to_move);
                 }
             }
         }
     }
+    //Paso referencias de las canciones ya que considero que en una implementacion real se deberia pasar una referencia de un elemento de la playlist, ya que se esta buscando dentro de la misma
+    //en el caso de que no sea correcto hubiera creado nuevas canciones con el new del estruct apartir de la info original
     fn buscar_cancion_por_nombre(&self,nombre:String) -> Option<&Cancion>{
         for i in 0..self.canciones.len(){
             if self.canciones[i].titulo == nombre{
@@ -101,12 +94,22 @@ impl Playlist {
     }
     fn canciones_por_genero(&self,genero:Genero) -> Vec<&Cancion>{
         let genero_str = genero.to_string();
-        let iter_canciones = self.canciones.iter();
-        iter_canciones.filter(|c| *c.genero.to_string() == genero_str).collect()
+        let mut canciones_encontradas =  Vec::new();
+        for i in 0..self.canciones.len(){
+            if self.canciones[i].genero.to_string() == genero_str{
+                canciones_encontradas.push(&self.canciones[i]);
+            }
+        }
+        canciones_encontradas
     }
     fn canciones_artista(&self,artista:String) -> Vec<&Cancion>{
-        let iter_canciones = self.canciones.iter();
-        iter_canciones.filter(|c| *c.artista == artista).collect()
+        let mut canciones_artista = Vec::new();
+        for i in 0..self.canciones.len(){
+            if self.canciones[i].artista == artista{
+                canciones_artista.push(&self.canciones[i]);
+            }
+        }
+        canciones_artista
     }
     fn modificar_titulo(&mut self,nuevo_titulo:String){
         self.nombre = nuevo_titulo;
@@ -118,8 +121,16 @@ impl Playlist {
         let mut reporte = Reporte::new();
         for i in 0..self.canciones.len(){
             if self.canciones[i].genero.to_string() == genero.to_string(){
-                let registro_reporte = RegistroReporte::new(i as i32, self.canciones[i].clone());
-                reporte.info.push(registro_reporte);
+                let genero_copia = match genero{
+                    Genero::Rock => Genero::Rock,
+                    Genero::Pop => Genero::Pop,
+                    Genero::Rap => Genero::Rap,
+                    Genero::Jazz => Genero::Jazz,
+                    Genero::Others => Genero::Others,
+                };
+                let copia_cancion = Cancion::new(self.canciones[i].titulo.clone(), self.canciones[i].artista.clone(), genero_copia);
+                let registro_reporte = RegistroReporte::new(i as i32,copia_cancion);
+                reporte.canciones.push(registro_reporte);
                 reporte.total_canciones+=1;
             }
         }
@@ -128,10 +139,10 @@ impl Playlist {
 }
 impl Reporte{
     fn new() -> Reporte{
-        let info = Vec::new();
+        let canciones = Vec::new();
         let total_canciones = 0;
         let reporte = Reporte{
-            info,
+            canciones,
             total_canciones
         };
         reporte
@@ -219,4 +230,8 @@ fn test_canciones_por_artista(){
 fn test_generar_reporte_genero(){
     let playlist = generar_playlist();
     let reporte =playlist.generar_reporte_genero(Genero::Rock);
+    assert_eq!(reporte.canciones.len(),2);
+    for i in 0..reporte.canciones.len(){
+        assert_eq!(reporte.canciones[i].cancion.genero.to_string(),Genero::Rock.to_string());
+    }
 }
