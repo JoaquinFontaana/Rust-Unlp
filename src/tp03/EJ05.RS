@@ -36,6 +36,6 @@ impl Producto{
 fn test_calcular_precio_total(){
     let producto = Producto::new("Yerba".to_string(),200.0,293894);
     let descuento = Some(10.0);
-    let impuesto = None;
-    assert_eq!(producto.calcular_precio_total(descuento,impuesto),180.0);
+    let impuesto = Some(20.0);
+    assert_eq!(producto.calcular_precio_total(descuento,impuesto),216.0);
 }
