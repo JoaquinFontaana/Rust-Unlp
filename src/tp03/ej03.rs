@@ -1,10 +1,10 @@
-struct Fecha{
-dia:i32,
-mes:i32,
-año:i32,
+pub struct Fecha{
+    pub dia:i32,
+    pub mes:i32,
+    pub año:i32,
 }
 impl Fecha{
-    fn new(dia:i32,mes:i32,año:i32) -> Fecha{
+    pub fn new(dia:i32,mes:i32,año:i32) -> Fecha{
         let fecha = Fecha{
             dia,
             año,
@@ -12,7 +12,7 @@ impl Fecha{
         };
         fecha
     }
-    fn es_fecha_valida(&self) -> bool{
+    pub fn es_fecha_valida(&self) -> bool{
         let mes = self.mes;
         let dia =  self.dia;
         if mes < 1 || mes > 12 {
@@ -35,7 +35,7 @@ impl Fecha{
         };
         dia >= 1 && dia <= dias_validos
     }
-    fn es_bisiesto(&self) -> bool{
+    pub fn es_bisiesto(&self) -> bool{
         if self.año % 4 == 0 && (self.año % 100 != 0 || self.año % 400 == 0){
             return true;
         }
@@ -43,7 +43,7 @@ impl Fecha{
             return false;
         }
     }
-    fn sumar_dias(&mut self,dias:i32){
+    pub fn sumar_dias(&mut self,dias:i32){
         let mut dias_restantes = dias;
         while dias_restantes > 0{
             let bisiesto = self.es_bisiesto();
@@ -78,7 +78,7 @@ impl Fecha{
             }
         }
     }
-    fn es_mayor(&self, fecha: &Fecha) -> bool {
+    pub fn es_mayor(&self, fecha: &Fecha) -> bool {
         if self.año == fecha.año {
             if self.mes == fecha.mes {
                 return self.dia < fecha.dia;

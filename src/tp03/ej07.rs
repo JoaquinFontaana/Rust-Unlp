@@ -1,9 +1,8 @@
 use std::collections::LinkedList;
-
 struct ConcesionarioAuto{
     direccion:String,
     nombre:String,
-    capacidad:i32,
+    capacidad:u32,
     autos:Vec<Auto>
 }
 struct Auto{
@@ -24,9 +23,35 @@ impl  Auto {
         };
         return auto;
     }
+    fn calcular_precio(&self)->f64{
+        let mut precio = self.precio_bruto;
+        if match self.color{
+            Color::Amarillo => true,
+            Color::Rojo => true,
+            Color::Azul => true,
+            Color::Negro => false,
+            Color::Blanco => false,
+            Color::Verde => false
+        }{
+            precio += self.precio_bruto*0.25;
+        }
+        else {
+            precio -= self.precio_bruto*0.1;
+        }
+        if self.marca == "BMW".to_string() || self.marca == "bmw".to_string(){
+            precio += self.precio_bruto*0.15;
+        }
+        if self.año < 2000{
+            precio -= self.precio_bruto*0.5;
+        }
+        precio
+    }
+    fn comparar(&self, other: &Self) -> bool {
+        self.color.to_string() == other.color.to_string() && self.año == other.año && self.marca == other.marca && self.modelo == other.modelo && self.precio_bruto == other.precio_bruto
+    }
 }
 impl ConcesionarioAuto{
-    fn new(nombre:String,direccion:String,capacidad:i32) -> ConcesionarioAuto{
+    fn new(nombre:String,direccion:String,capacidad:u32) -> ConcesionarioAuto{
         let autos: Vec<Auto> = Vec::new();
         let concesionario = ConcesionarioAuto{
             direccion,
@@ -37,7 +62,11 @@ impl ConcesionarioAuto{
         concesionario
     }
     fn eliminar_auto(&mut self,auto:Auto){
-        self.autos.retain(|a| *a != auto);
+        for i in 0..self.autos.len(){
+            if auto.comparar(&self.autos[i]){
+                self.autos.remove(i);
+            }
+        }
     }
     fn agregar_auto(&mut self,auto:Auto) -> bool{
         if self.autos.len() < self.capacidad as usize{
@@ -48,13 +77,13 @@ impl ConcesionarioAuto{
             return false;
         }
     }
-    fn buscar_auto(&mut self, auto:Auto) -> Option<&Auto>{
-        self.autos.iter().find(|&a| *a == auto)
-    }
-}
-impl PartialEq for Auto {
-    fn eq(&self, other: &Self) -> bool {
-        self.color.to_string() == other.color.to_string() && self.año == other.año && self.marca == other.marca && self.modelo == other.modelo && self.precio_bruto == other.precio_bruto
+    fn buscar_auto(&mut self, auto:&Auto) -> Option<Auto>{
+        for i in 0..self.autos.len(){
+            if auto.comparar(&self.autos[i])  {
+                self.autos.get(i);
+            }
+        }
+        None
     }
 }
 
@@ -96,5 +125,13 @@ fn test_eliminar_auto(){
 }
 #[test]
 fn test_buscar_auto(){
-    
+    let mut concesionario = ConcesionarioAuto::new("Toyota".to_string(), "Rivadavia 1895".to_string(), 10);
+    let auto = Auto::new(2002,"Toyota".to_string(),"Hilux".to_string(),203423.0,Color::Blanco);
+    concesionario.agregar_auto(auto);
+    let auto = Auto::new(2002,"Ford".to_string(),"Raptor".to_string(),203423.0,Color::Blanco);
+    let auto_encontrado = match concesionario.buscar_auto(&auto){
+        Some(auto) => auto,
+        None => return
+    };
+    assert_eq!(auto.comparar(&auto_encontrado),true);
 }

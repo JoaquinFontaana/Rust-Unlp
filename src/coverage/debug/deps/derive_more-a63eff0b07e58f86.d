@@ -1,0 +1,10 @@
+C:\Users\joaco\OneDrive\Escritorio\Facultad\Rust-unlp\src\coverage\debug\deps\derive_more-a63eff0b07e58f86.dll: C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\lib.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\utils.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\display.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\error.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\from.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\parsing.rs
+
+C:\Users\joaco\OneDrive\Escritorio\Facultad\Rust-unlp\src\coverage\debug\deps\derive_more-a63eff0b07e58f86.d: C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\lib.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\utils.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\display.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\error.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\from.rs C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\parsing.rs
+
+C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\lib.rs:
+C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\utils.rs:
+C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\display.rs:
+C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\error.rs:
+C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\from.rs:
+C:\Users\joaco\.cargo\registry\src\index.crates.io-6f17d22bba15001f\derive_more-0.99.17\src\parsing.rs:
