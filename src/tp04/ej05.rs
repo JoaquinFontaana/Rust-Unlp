@@ -1,19 +1,28 @@
 #![allow(dead_code)]
 use std::{collections::HashMap, hash::Hash};
 use rand::Rng;
+use serde::ser::SerializeMap;
 use std::fmt::Display;
-use serde::{Serialize, Deserialize};
+use serde::{Serialize,Serializer, Deserialize};
 use serde_json::Error as SerdeError;
 use std::fs::File;
 use std::io::{BufReader, BufWriter};
 
-#[derive(Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
+#[derive(Clone, Eq, PartialEq, Hash, Debug,Deserialize)]
 struct CriptoMoneda {
     nombre: String,
     prefijo: String,
     blockchains: Vec<Blockchain>,
 }
-
+impl Serialize for CriptoMoneda {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        // Serializar solo el nombre de la criptomoneda
+        self.nombre.serialize(serializer)
+    }
+}
 #[derive(Clone, Eq, PartialEq, Hash, Debug, Serialize, Deserialize)]
 struct Blockchain {
     nombre: String,
@@ -27,10 +36,33 @@ struct Usuario {
     nombre: String,
     apellido: String,
     verificacion: bool,
+    #[serde(serialize_with = "serialize_balance_cripto")]
     balance_cripto: HashMap<CriptoMoneda, f64>,
     balance_fiat: f64,
 }
 
+fn serialize_balance_cripto<S>(balance: &HashMap<CriptoMoneda, f64>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut map = serializer.serialize_map(Some(balance.len()))?;
+
+    for (cripto_moneda, cantidad) in balance {
+        // Serializar la clave (nombre de la criptomoneda)
+        let key = match serde_json::to_string(cripto_moneda) {
+            Ok(key) => key,
+            Err(error) => return Err(serde::ser::Error::custom(error)),
+        };
+        // Serializar el valor (cantidad)
+        let value = match serde_json::to_value(cantidad) {
+            Ok(value) => value,
+            Err(error) => return Err(serde::ser::Error::custom(error)),
+        };
+        map.serialize_entry(&key, &value)?;
+    }
+
+    map.end()
+}
 #[derive(Serialize, Deserialize)]
 struct XYZ {
     usuarios: Vec<Usuario>,
@@ -269,7 +301,10 @@ impl<'a> XYZ{
                 let transaccion_cripto = VentaCompraCripto::new(*cotizacion, cripto.clone());
                 let new_transaccion = Transaccion::new(fecha, TipoTransaccion::CriptoMoneda(TipoOperacionCripto::Compra(transaccion_cripto)), monto_acreditar_cripto, usuario_base_datos.clone());
                 self.transacciones.push(new_transaccion);
-                self.guardar_datos("usuarios.json", "transacciones.json")?; // Guardar datos
+                match self.guardar_datos("usuarios.json", "transacciones.json"){
+                    Ok(_) => (),
+                    Err(e) => return Err(ErrorCustom(e.to_string()))
+                } // Guardar datos
                 return Ok(true);
             } else {
                 return Err(ErrorCustom("No se pudo obtener la cotización de la criptomoneda".to_string()));
@@ -284,6 +319,7 @@ impl<'a> XYZ{
             if let Some((_, balance_actual_cripto)) = usuario_base_datos.balance_cripto.iter_mut().find(|(cripto_base_datos, _)| cripto_base_datos.nombre == cripto.nombre) {
                 if *balance_actual_cripto < monto_cripto {
                     return Err(ErrorCustom("Balance de la cripto moneda insuficiente".to_string()));
+                    
                 } else if let Some((_, cotizacion)) = self.sistema_cotizaciones.cotizaciones.iter().find(|(c, _)| c.nombre == cripto.nombre) {
                     let monto_acreditar_fiat = monto_cripto * cotizacion;
                     usuario_base_datos.balance_fiat += monto_acreditar_fiat;
@@ -595,8 +631,11 @@ mod tests {
         xyz.crear_usuario(String::from("123456789"), String::from("test@example.com"), String::from("John"), String::from("Doe"), true);
         //Ingresar fiat para la compra
         xyz.ingresar_fiat(&user, 100.0, String::from("2024-05-30"));
-        // Comprar criptomoneda con suficiente saldo fiat
-        assert_eq!(xyz.comprar_cripto_moneda(String::from("2024-05-30"), &user, xyz.cripto_monedas[0].clone(), 100.0).is_ok(), true);
+        let result = xyz.comprar_cripto_moneda(String::from("2024-05-30"), &user, xyz.cripto_monedas[0].clone(), 100.0);
+    if let Err(e) = &result {
+        println!("Error: {:?}", e);
+    }
+    assert!(result.is_ok(), "Falló la compra de criptomoneda con suficiente saldo fiat: {:?}", result);
         // Verificar que el saldo de fiat del usuario se haya actualizado
         assert_eq!(xyz.usuarios[0].balance_fiat, 0.0);
         // Verificar que el saldo de criptomoneda del usuario se haya actualizado
